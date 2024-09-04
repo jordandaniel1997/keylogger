@@ -1,53 +1,34 @@
 import keyboard
 
-word = []
-void_str = ''
-#TODO: configurar correctamente ambos contadores: arrow left y arrow right
-start_index = 1
-counter_push_arrow_left = start_index
-counter_push_arrow_right = start_index
-
-def print_info()->None:
-    print(counter_push_arrow_left)
-    print(word)
-    print(void_str.join(word))
-
-def space_key()->None:
+def space_key(word_lst, index_dict)->None:
     space = ' '
     
-    #TODO: configurar correctamente ambos contadores: arrow left y arrow right
-    if counter_push_arrow_left == start_index:
-        word.append(space)
+    if index_dict["index_negative"]["index_right"] == index_dict["index_negative"]["start_index"]:
+        word_lst.append(space)
     else:
-        word.insert(-counter_push_arrow_left + 1, space)
+        word_lst.insert(index_dict["index_negative"]["index_right"] + 1, space)
 
-
-def back_del_key()->None: 
-    #TODO: configurar correctamente ambos contadores: arrow left y arrow right
-    if counter_push_arrow_left == start_index:
-        word.pop()
+def back_delete_key(word_lst:list, index_dict:dict)->None: 
+    if index_dict["index_negative"]["index_right"] == index_dict["index_negative"]["start_index"]:
+        word_lst.pop()
     else:
-        word.pop(-counter_push_arrow_left)
-
-
-def arrow_left()->None:
-    global counter_push_arrow_left
-    global counter_push_arrow_right
-    #TODO: configurar correctamente ambos contadores: arrow left y arrow right
-    counter_push_arrow_left += 1
-    print(counter_push_arrow_left)
-    
-
-#TODO: Terminar funcion al presionar la flecha derecha
-def arrow_right()->None:
-    global counter_push_arrow_right
-    global counter_push_arrow_left
-    
-    if counter_push_arrow_left == start_index:
-        counter_push_arrow_right = start_index
+        word_lst.pop(index_dict["index_negative"]["index_right"])
         
+    print(word_lst)
+    
+#FIXME: Reparar funcion de flecha izquierda cuando el foco se encuentra al inicio
+def arrow_left(word_lst, index_dict)->None:
+    length_word = len(word_lst)
+    
+    index_dict["index_negative"]["index_right"] += -1
+    index_dict["index_default"]["index_left"] += 1
+    
+#FIXME: Reparar funcion de flecha derecha cuando el foco se encunentra al final
+def arrow_right(index_dict)->None:
+    index_dict["index_default"]["index_left"] += 1
+    index_dict["index_negative"]["index_right"] -= -1
         
-def key_handless(key):
+def key_handless(key:str, word_lst:list, index_dict:dict)->None:
     '''
     Esta función gestiona las teclas presionadas por el usuario
     en base a eso, ejecuta cierta función dependiendo de la tecla
@@ -57,30 +38,57 @@ def key_handless(key):
         # Se presionaron teclas que no son letras como ctrl, shift, tab, etc.
         match key:
             case 'space':
-                space_key()
-            case 'backspace':
-                back_del_key()
-            case 'flecha izquierda':
-                arrow_left()
-            case 'flecha derecha':
-                arrow_right()
+                space_key(word_lst, index_dict)
+                print(word_lst)
                 
-        print_info()
+            case 'backspace':
+                back_delete_key(word_lst, index_dict)
+                
+            case 'flecha izquierda':
+                arrow_left(word_lst, index_dict)
+                print(index_dict)
+                print(word_lst[index_dict["index_negative"]["index_right"]])
+                print(word_lst[index_dict["index_default"]["index_left"]])
+                
+            case 'flecha derecha':
+                arrow_right(index_dict)
+                print(index_dict["index_negative"]["index_right"])
+                print(index_dict["index_default"]["index_left"])                  
     else:
-        # El flujo de programa entra aquí si se presiona una letra
-        #TODO: configurar correctamente ambos contadores: arrow left y arrow right
-        if counter_push_arrow_left == start_index:
-            word.append(key)
+        """_summary_
+        El flujo de programa entra aquí si se presiona una letra: a - z
+        """
+        if index_dict["index_negative"]["index_right"] == index_dict["index_negative"]["start_index"]:
+            word_lst.append(key)
+            print(word_lst)
         else:
-            word.insert(-counter_push_arrow_left + 1, key)
-            
+            word_lst.insert(index_dict["index_negative"]["index_right"] + 1, key)
+            print(word_lst)
+
 def main():
-    # keyboard.on_press(lambda key: print(key), suppress=False)
-    keyboard.on_press(lambda k: key_handless(k.name), suppress=False)
+    word_list = []
+    void_str = ''
+    indexes = {
+        "index_negative": {
+            "start_index": -1,
+            "index_right": None
+        },
+        "index_default": {
+            "start_index": 0,
+            "index_left": None
+        }
+    }
+    indexes['index_negative']["index_right"] = indexes['index_negative']["start_index"]
+    indexes['index_default']["index_left"] = indexes['index_default']["start_index"]
+    
+    key_press = lambda k: key_handless(k.name, word_list, indexes)
+    keyboard.on_press(key_press, suppress=False)
+    
+    # Mantiene la ejecución del script
     while True:
         if keyboard.is_pressed('esc'): break
     
-    print(void_str.join(word))
+    print(void_str.join(word_list))
     
 
 if __name__ == "__main__":
