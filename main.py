@@ -28,7 +28,7 @@ def arrow_right(index_dict)->None:
     index_dict["index_default"]["index_left"] += 1
     index_dict["index_negative"]["index_right"] -= -1
         
-def key_handless(key:str, word_lst:list, index_dict:dict)->None:
+def key_handler(key:str, word_lst:list, index_dict:dict)->None:
     '''
     Esta función gestiona las teclas presionadas por el usuario
     en base a eso, ejecuta cierta función dependiendo de la tecla
@@ -81,7 +81,7 @@ def main():
     indexes['index_negative']["index_right"] = indexes['index_negative']["start_index"]
     indexes['index_default']["index_left"] = indexes['index_default']["start_index"]
     
-    key_press = lambda k: key_handless(k.name, word_list, indexes)
+    key_press = lambda k: key_handler(k.name, word_list, indexes)
     keyboard.on_press(key_press, suppress=False)
     
     # Mantiene la ejecución del script
